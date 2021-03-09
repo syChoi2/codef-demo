@@ -40,7 +40,7 @@ public class ProductController {
 	@ApiOperation(value="API 호출")
 	//@ApiImplicitParam(name = "x-access-token", value = "토큰", required = true, dataType = "String", paramType = "header")
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "Authorization",paramType = "header", value = "토큰", required = true, example = "eyJhbGciOiJIUzUxMiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcklkIjoiOSIsImlzcyI6ImNvZGVmX2RlbW8iLCJpYXQiOjE2MTUyNzMyNjl9.8I-tykRK0dizNz0eUwlzeSPDIfQBHCB7ZF_Cj5ggrUMbFU820d9f1kM2iJhwc4ota7oPpQ4aDWLDOgBX_qO4xg")
+			@ApiImplicitParam(name = "Authorization",paramType = "header", value = "토큰", required = true, example = "eyJhbGciOiJIUzUxMiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcklkIjoiMTIiLCJpc3MiOiJjb2RlZl9kZW1vIiwiaWF0IjoxNjE1MjgwNzMzfQ.8J-0NdrPlfSmlawA9hBTeBQDCsPlbCmcFU99AKE9JW604d5CDBGkL33sMEXWZ8w1k1np4ZGB5Yb86IDr6vhXtQ")
 	})
 	@PostMapping("/{versionCode}/{countryCode}/{jobCode}/{customerCode}/{productCode}")
 	public JSONObject apiCall(
