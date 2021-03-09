@@ -46,7 +46,7 @@ public class ProductService {
 		Optional<UserProductRegister> optionalUserProductRegister = userProductRegisterRepository.findUserProductRegister(userId, product.getProductId());
 		
 		if(optionalUserProductRegister.isEmpty()) {
-			throw new BusinessException("상품 등록 정보 없음", ErrorCode.NOT_FOUND);
+			throw new BusinessException("해당 상품 권한 없음", ErrorCode.NOT_FOUND);
 		}
 		
 		// 2. parameter확인

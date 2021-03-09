@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import com.codef.api.dto.UserDto;
 import com.codef.api.dto.UserInfoDto;
 import com.codef.api.entity.Users;
+import com.codef.api.exception.BusinessException;
+import com.codef.api.exception.ErrorCode;
 import com.codef.api.repository.UserRepository;
 import com.codef.api.util.BytesToHex;
 
@@ -34,8 +36,14 @@ public class UserService {
 	public UserDto join(UserInfoDto userInfoDto) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		
 		// 1. 값 검증
-        checkNotNull(userInfoDto.getPassword(), "password must be provided.");
-        checkArgument(userInfoDto.getPassword().length() >= 8 && userInfoDto.getPassword().length() <= 15, "8 < 비밀번호 길이 <= 15" );
+		String emailRegEx = "[A-Z0-9a-z.-_]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,3}";
+		if(!userInfoDto.getEmail().matches(emailRegEx)) {
+			throw new BusinessException("올바른 이메일 형식을 사용하세요.", ErrorCode.INVALID_FORMAT);
+		}
+
+		checkNotNull(userInfoDto.getPassword(), "비밀번호를 입력하세요.");
+		checkArgument(userInfoDto.getPassword().length() >= 8 && userInfoDto.getPassword().length() <= 15, "8 < 비밀번호 길이 <= 15" );
+		
         
         // 2. client id, secret 발급
         String clientId = UUID.randomUUID().toString();

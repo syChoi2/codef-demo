@@ -1,5 +1,8 @@
 package com.codef.api.configuration;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.simple.JSONObject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,14 +13,20 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.codef.api.dto.ResponseDto;
+import com.codef.api.dto.ResultDto;
 import com.codef.api.enums.Role;
+import com.codef.api.exception.BusinessException;
+import com.codef.api.exception.ErrorCode;
 import com.codef.api.jwt.JwtAuthenticationFilter;
 import com.codef.api.jwt.JwtProvider;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Configuration
+@Slf4j
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final JwtProvider jwtProvider;
@@ -44,6 +53,49 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/auth/token").permitAll()
             .antMatchers("/v1/**").hasRole(Role.USER.name())
             .anyRequest().permitAll()// 그외 나머지 요청은 모두 인증된 회원만 접근 가능.and()
+    		.and()
+    		.exceptionHandling()
+		    .authenticationEntryPoint((request, response, e) -> {
+
+
+		        response.setContentType("application/json;charset=UTF-8");
+		        
+				
+				int httpStatus = response.getStatus();
+				String errorCode = "";
+				String message = "";
+				BusinessException ee = null;
+				if( httpStatus == HttpServletResponse.SC_NON_AUTHORITATIVE_INFORMATION) {
+
+					ee = new BusinessException(ErrorCode.ACCESS_TOKEN_EXPIRED);
+					log.error("SecurityAuthenticationException", ee);
+			        errorCode = ErrorCode.ACCESS_TOKEN_EXPIRED.getCode();
+			        message = ee.getErrorCode().getMessage();
+			        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			        
+				} else if( httpStatus == HttpServletResponse.SC_UNAUTHORIZED) {
+
+					ee = new BusinessException(ErrorCode.UNAUTHORIZED);
+					log.error("SecurityAuthenticationException", ee);
+					errorCode = ErrorCode.UNAUTHORIZED.getCode();
+					message = ee.getErrorCode().getMessage();
+					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+					
+				}
+				
+				ResultDto resultDto = ResultDto.builder()
+						.code(errorCode)
+						.message(message)
+						.extraMessage("")
+						.build();
+				
+				JSONObject errorResponse = new JSONObject();
+				errorResponse.put("result", resultDto);
+				errorResponse.put("data", null);
+				response.getWriter().write(errorResponse.toString());
+		        
+		        
+		    })
             ;
 
         http.addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);

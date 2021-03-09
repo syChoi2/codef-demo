@@ -13,10 +13,14 @@ import com.codef.api.dto.UserInfoDto;
 import com.codef.api.service.AuthenticationService;
 import com.codef.api.service.UserService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@Api(tags = "ect-controller", description = "회원가입, access token 발급 api")
 public class EctController {
 
 	private final AuthenticationService authenticationService;
@@ -28,8 +32,9 @@ public class EctController {
 	 * @throws UnsupportedEncodingException 
 	 * @throws NoSuchAlgorithmException 
 	 */
+	@ApiOperation(value="회원가입 + 클라이언트 ID, SECRET 발급")
     @PostMapping("/users")
-    public UserDto createUser(@RequestBody UserInfoDto userInfoDto) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    public UserDto createUser(@RequestBody @ApiParam(value = "회원가입에 필요한 param", required =true) UserInfoDto userInfoDto) throws NoSuchAlgorithmException, UnsupportedEncodingException {
     	
     	UserDto userDto = userService.join(userInfoDto);
 
@@ -40,8 +45,9 @@ public class EctController {
 	/**
 	 * client id, secret 으로 access token 발급
 	 */
+	@ApiOperation(value="client id, secret 으로 access token 발급")
 	@PostMapping("/auth/token")
-	public String getAccessToken(@RequestBody ClientInfoDto authTokenRequestDto) {
+	public String getAccessToken(@RequestBody @ApiParam(value = "access token에 필요한 param", required =true) ClientInfoDto authTokenRequestDto) {
 		
 		String accessToken = authenticationService.getAccessToken(authTokenRequestDto);
 		
